@@ -95,7 +95,7 @@ def getForwardHeaders(request):
         val = request.headers.get(ihdr)
         if val is not None:
             headers[ihdr] = val
-            print "incoming: "+ihdr+":"+val
+            app.logger.debug("incoming: "+ihdr+":"+val)
 
     return headers
 
