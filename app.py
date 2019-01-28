@@ -3,6 +3,8 @@ import requests
 import os
 import sys
 import logging
+import datetime
+import time
 
 from flask import Flask, request, session
 from flask import _request_ctx_stack as stack
@@ -111,7 +113,8 @@ def index():
     # Call Name Service
     status, name = getName(nameserviceUrl, headers) 
     app.logger.debug('NAME-RESPONSE: ' + name)
-    return "%s, %s!" % (greeting, name)
+    timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    return "%s %s, %s!" % (timestamp, greeting, name)
 
 def getGreeting(greeterUrl, headers):
     try:
