@@ -114,7 +114,7 @@ def index():
     status, name = getName(nameserviceUrl, headers) 
     app.logger.debug('NAME-RESPONSE: ' + name)
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    return "%s %s, %s!" % (timestamp, greeting, name)
+    return "%s %s, %s!\n" % (timestamp, greeting, name)
 
 def getGreeting(greeterUrl, headers):
     try:
