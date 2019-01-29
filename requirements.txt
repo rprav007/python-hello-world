@@ -1,5 +1,6 @@
 flask
 requests==2.17.3
 flask_prometheus
--e git+https://github.com/yurishkuro/jaeger-client-python.git@d631596415cb549a4e8314cc25d6c53fab710528#egg=jaeger-client
-opentracing>=2,<3
+jaeger-client==3.11.0
+opentracing==1.2.2
+opentracing-instrumentation==2.4.3
