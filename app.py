@@ -51,10 +51,18 @@ def init_tracer(service):
     )
     return config.initialize_tracer()
 
-tracer = init_tracer('hello-world')
+#tracer = init_tracer('hello-world')
+tracer = Tracer(
+    one_span_per_rpc=True,
+    service_name='hello-world-service',
+    reporter=NullReporter(),
+    sampler=ConstSampler(decision=True),
+    extra_codecs={Format.HTTP_HEADERS: B3Codec()}
+)
 
 @app.route('/')
 def index():
+    request = stack.top.request
     span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
     span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
     with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
