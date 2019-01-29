@@ -72,7 +72,9 @@ def index():
 def getGreeting(root_span):
     with tracer.start_span('greeting', child_of=root_span) as span:
         try: 
+            app.logger.debug('GETTING GREETING')
             res = http_get(greeterUrl, root_span)
+            app.logger.debug('GOT GREETING')
             span.log_kv({'event': 'get-greeting', 'value': res.text})
         except:
             res = None
@@ -97,6 +99,7 @@ def getName(root_span):
 
 def http_get(url, root_span):
     # span = tracer.active_span
+    app.logger.debug('ENTERED HTTP GET')
     root_span.set_tag(tags.HTTP_METHOD, 'GET')
     root_span.set_tag(tags.HTTP_URL, url)
     root_span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
@@ -104,6 +107,7 @@ def http_get(url, root_span):
     tracer.inject(span, Format.HTTP_HEADERS, headers)
 
     r = requests.get(url, headers=headers)
+    app.logger.debug('REQUEST STATUS CODE: ' + r.status_code)
     assert r.status_code == 200
     return r
 
