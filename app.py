@@ -113,7 +113,7 @@ def http_get(url, root_span):
     app.logger.debug('GETTING: ' + url)
 
     r = requests.get(url, headers=headers)
-    app.logger.debug('REQUEST STATUS CODE: ' + r.status_code)
+    # app.logger.debug('REQUEST STATUS CODE: ' + r.status_code)
     assert r.status_code == 200
     return r
 
