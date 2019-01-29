@@ -71,18 +71,22 @@ def index():
 
 def getGreeting(root_span):
     with tracer.start_span('greeting', child_of=root_span) as span:
-        try: 
-            app.logger.debug('GETTING GREETING')
-            res = http_get(greeterUrl, root_span)
-            app.logger.debug('GOT GREETING')
-            span.log_kv({'event': 'get-greeting', 'value': res.text})
-        except:
-            res = None
-        if res and res.status_code == 200:
-            return 200, res.text
-        else:
-            status = res.status_code if res is not None and res.status_code else 500
-            return status, 'Sorry, greetings not available.'
+        app.logger.debug('GETTING GREETING')
+        res = http_get(greeterUrl, root_span)
+        span.log_kv({'event': 'get-greeting', 'value': res.text})
+        return 200, res.text      
+ #       try: 
+ #           app.logger.debug('GETTING GREETING')
+ #           res = http_get(greeterUrl, root_span)
+ #           app.logger.debug('GOT GREETING')
+ #           span.log_kv({'event': 'get-greeting', 'value': res.text})
+ #       except:
+ #           res = None
+ #       if res and res.status_code == 200:
+ #           return 200, res.text
+ #       else:
+ #           status = res.status_code if res is not None and res.status_code else 500
+ #           return status, 'Sorry, greetings not available.'
 
 def getName(root_span):
     with tracer.start_active_span('get-name', child_of=root_span) as span:
