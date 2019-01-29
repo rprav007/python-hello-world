@@ -104,7 +104,7 @@ def http_get(url, root_span):
     root_span.set_tag(tags.HTTP_URL, url)
     root_span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
     headers = {}
-    tracer.inject(span, Format.HTTP_HEADERS, headers)
+    tracer.inject(root_span, Format.HTTP_HEADERS, headers)
     
     app.logger.debug('GETTING: ' + url)
 
