@@ -63,7 +63,7 @@ tracer = Tracer(
 @app.route('/')
 def index():
     request = stack.top.request
-    span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
+    span_ctx = tracer.extract(Format.HTTP_HEADERS, dict(request.headers))
     span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
     with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
         # Call Greeter Service
