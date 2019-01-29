@@ -133,6 +133,9 @@ def index():
 #    span_ctx = tracer.extract(Format.HTTP_HEADERS, dict(request.headers))
 #    span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
     status, greeting = getGreeting()
+    status, name = getName() 
+    return "%s %s, %s!\n" % (timestamp, greeting, name)
+
 #   with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
 #       # Call Greeter Service
 #       span.set_tag('hello', 'begin')
@@ -146,18 +149,30 @@ def index():
 #       return "%s %s, %s!\n" % (timestamp, greeting, name)
 
 def getGreeting():
-        try: 
-            headers = getForwardHeaders(request)
-            app.logger.debug('GETTING GREETING')
-            res = http_get(greeterUrl, headers)
-            app.logger.debug('GOT GREETING')
-        except:
-            res = None
-        if res and res.status_code == 200:
-            return 200, res.text
-        else:
-            status = res.status_code if res is not None and res.status_code else 500
-            return status, 'Sorry, greetings not available.'
+    try: 
+        headers = getForwardHeaders(request)
+        app.logger.debug('GETTING GREETING')
+        res = http_get(greeterUrl, headers)
+        app.logger.debug('GOT GREETING')
+    except:
+        res = None
+    if res and res.status_code == 200:
+        return 200, res.text
+    else:
+        status = res.status_code if res is not None and res.status_code else 500
+        return status, 'Sorry, greetings not available.'
+
+def getName():
+    try: 
+        headers = getForwardHeaders(request)
+        res = http_get(nameserviceUrl, headers)
+    except:
+        res = None
+    if res and res.status_code == 200:
+        return 200, res.text
+    else:
+        status = res.status_code if res is not None and res.status_code else 500
+        return status, 'Sorry, name service not available.'
 
     
 #def getGreeting(root_span):
@@ -179,18 +194,18 @@ def getGreeting():
 #            status = res.status_code if res is not None and res.status_code else 500
 #            return status, 'Sorry, greetings not available.'
 #
-def getName(root_span):
-    with tracer.start_span('get-name', child_of=root_span) as span:
-        try: 
-            res = http_get(nameserviceUrl, root_span)
-            span.log_kv({'event': 'get-name', 'value': res.text})
-        except:
-            res = None
-        if res and res.status_code == 200:
-            return 200, res.text
-        else:
-            status = res.status_code if res is not None and res.status_code else 500
-            return status, 'Sorry, name service not available.'
+#def getName(root_span):
+#    with tracer.start_span('get-name', child_of=root_span) as span:
+#        try: 
+#            res = http_get(nameserviceUrl, root_span)
+#            span.log_kv({'event': 'get-name', 'value': res.text})
+#        except:
+#            res = None
+#        if res and res.status_code == 200:
+#            return 200, res.text
+#        else:
+#            status = res.status_code if res is not None and res.status_code else 500
+#            return status, 'Sorry, name service not available.'
 
 def http_get(url, headers):
     r = requests.get(url, headers=headers)
