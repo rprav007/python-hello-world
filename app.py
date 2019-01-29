@@ -55,9 +55,9 @@ tracer = init_tracer('hello-world')
 
 @app.route('/')
 def index():
-    # Get Headers
-    # headers = getForwardHeaders(request)
-    with tracer.start_span('say-hello') as span:
+    span_ctx = tracer.extract(Format.HTTP_HEADERS, request.headers)
+    span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
+    with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
         # Call Greeter Service
         span.set_tag('hello', 'begin')
         status, greeting = getGreeting(span)
