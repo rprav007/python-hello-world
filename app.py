@@ -34,6 +34,7 @@ app.logger.debug('NAMESERVICE: ' + nameserviceUrl)
 #    sampler=ConstSampler(decision=True),
 #    extra_codecs={Format.HTTP_HEADERS: B3Codec()}
 #)
+
 def init_tracer(service):
     logging.getLogger('').handlers = []
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
@@ -50,33 +51,29 @@ def init_tracer(service):
     )
     return config.initialize_tracer()
 
+tracer = init_tracer('hello-world')
+
 @app.route('/')
 def index():
-
-    tracer = init_tracer('hello-world')
     # Get Headers
     # headers = getForwardHeaders(request)
-    say_hello(tracer)
-    tracer.close
-
-def say_hello(tracer):
-    with tracer.start_active_span('say-hello') as scope:
+    with tracer.start_span('say-hello') as span:
         # Call Greeter Service
-        scope.span.set_tag('hello', 'begin')
-        status, greeting = getGreeting(tracer)
+        span.set_tag('hello', 'begin')
+        status, greeting = getGreeting(span)
         app.logger.debug('GREETER-RESPONSE: ' + greeting)
 
         # Call Name Service
-        status, name = getName(tracer) 
+        status, name = getName(span) 
         app.logger.debug('NAME-RESPONSE: ' + name)
         timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
         return "%s %s, %s!\n" % (timestamp, greeting, name)
 
-def getGreeting(tracer):
-    with tracer.start_active_span('greeting') as scope:
+def getGreeting(root_span):
+    with tracer.start_span('greeting', child_of=root_span) as span:
         try: 
-            res = http_get(tracer, greeterUrl)
-            scope.span.log_kv({'event': 'get-greeting', 'value': res.text})
+            res = http_get(greeterUrl, root_span)
+            span.log_kv({'event': 'get-greeting', 'value': res.text})
         except:
             res = None
         if res and res.status_code == 200:
@@ -85,11 +82,11 @@ def getGreeting(tracer):
             status = res.status_code if res is not None and res.status_code else 500
             return status, 'Sorry, greetings not available.'
 
-def getName(tracer):
-    with tracer.start_active_span('get-name') as scope:
+def getName(root_span):
+    with tracer.start_active_span('get-name', child_of=root_span) as span:
         try: 
-            res = http_get(tracer, nameserviceUrl)
-            scope.span.log_kv({'event': 'get-name', 'value': res.text})
+            res = http_get(nameserviceUrl, root_span)
+            span.log_kv({'event': 'get-name', 'value': res.text})
         except:
             res = None
         if res and res.status_code == 200:
@@ -98,11 +95,11 @@ def getName(tracer):
             status = res.status_code if res is not None and res.status_code else 500
             return status, 'Sorry, name service not available.'
 
-def http_get(tracer, url):
-    span = tracer.active_span
-    span.set_tag(tags.HTTP_METHOD, 'GET')
-    span.set_tag(tags.HTTP_URL, url)
-    span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
+def http_get(url, root_span):
+    # span = tracer.active_span
+    root_span.set_tag(tags.HTTP_METHOD, 'GET')
+    root_span.set_tag(tags.HTTP_URL, url)
+    root_span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
     headers = {}
     tracer.inject(span, Format.HTTP_HEADERS, headers)
 
