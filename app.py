@@ -134,6 +134,8 @@ def index():
 #    span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
     status, greeting = getGreeting()
     status, name = getName() 
+    timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+
     return "%s %s, %s!\n" % (timestamp, greeting, name)
 
 #   with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
