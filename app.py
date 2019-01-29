@@ -127,7 +127,6 @@ def getForwardHeaders(request):
     return headers
 
 @app.route('/')
-@trace()
 def index():
 #    request = stack.top.request
 #    span_ctx = tracer.extract(Format.HTTP_HEADERS, dict(request.headers))
@@ -150,6 +149,7 @@ def index():
 #       timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 #       return "%s %s, %s!\n" % (timestamp, greeting, name)
 
+@trace()
 def getGreeting():
     try: 
         headers = getForwardHeaders(request)
@@ -164,6 +164,7 @@ def getGreeting():
         status = res.status_code if res is not None and res.status_code else 500
         return status, 'Sorry, greetings not available.'
 
+@trace()
 def getName():
     try: 
         headers = getForwardHeaders(request)
