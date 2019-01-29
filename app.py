@@ -16,7 +16,6 @@ from jaeger_client.reporter import NullReporter
 from jaeger_client.codecs import B3Codec
 from opentracing.ext import tags
 from opentracing.propagation import Format
-from opentracing_instrumentation.request_context import get_current_span, span_in_context
 
 app = Flask(__name__)
 app.logger.addHandler(logging.StreamHandler(sys.stdout))
