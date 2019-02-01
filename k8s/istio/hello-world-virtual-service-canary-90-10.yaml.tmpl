@@ -1,0 +1,29 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hello-world
+spec:
+  gateways:
+  - hello-world-gateway
+  hosts:
+  - hello-world-service.<istio-subdomain>
+  http:
+  - match:
+    - uri:
+        exact: /
+    route:
+    - destination:
+        host: hello-world-service
+        port:
+          number: 8080
+        subset: production
+      weight: 90
+    - destination:
+        host: hello-world-service
+        port:
+          number: 8080
+        subset: canary 
+      weight: 10
+    retries:
+      attempts: 10
+      perTryTimeout: 12s

@@ -28,14 +28,6 @@ app.logger.debug('GREETERSERVICE: ' + greeterUrl)
 nameserviceUrl = os.environ.get('NAMESERVICE') if os.environ.get('NAMESERVICE') != None else 'http://localhost:8081'
 app.logger.debug('NAMESERVICE: ' + nameserviceUrl)
 
-#tracer = Tracer(
-#    one_span_per_rpc=True,
-#    service_name='productpage',
-#    reporter=NullReporter(),
-#    sampler=ConstSampler(decision=True),
-#    extra_codecs={Format.HTTP_HEADERS: B3Codec()}
-#)
-
 def init_tracer(service):
     logging.getLogger('').handlers = []
     logging.basicConfig(format='%(message)s', level=logging.DEBUG)
@@ -122,32 +114,16 @@ def getForwardHeaders(request):
         val = request.headers.get(ihdr)
         if val is not None:
             headers[ihdr] = val
-            #print "incoming: "+ihdr+":"+val
 
     return headers
 
 @app.route('/')
 def index():
-#    request = stack.top.request
-#    span_ctx = tracer.extract(Format.HTTP_HEADERS, dict(request.headers))
-#    span_tags = {tags.SPAN_KIND: tags.SPAN_KIND_RPC_SERVER}
     status, greeting = getGreeting()
     status, name = getName() 
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     return "%s %s, %s!\n" % (timestamp, greeting, name)
-
-#   with tracer.start_span('say-hello', child_of=span_ctx, tags=span_tags) as span:
-#       # Call Greeter Service
-#       span.set_tag('hello', 'begin')
-#       status, greeting = getGreeting(span)
-#       app.logger.debug('GREETER-RESPONSE: ' + greeting)
-#
-#       # Call Name Service
-#       status, name = getName(span) 
-#       app.logger.debug('NAME-RESPONSE: ' + name)
-#       timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-#       return "%s %s, %s!\n" % (timestamp, greeting, name)
 
 @trace()
 def getGreeting():
@@ -177,59 +153,10 @@ def getName():
         status = res.status_code if res is not None and res.status_code else 500
         return status, 'Sorry, name service not available.'
 
-    
-#def getGreeting(root_span):
-#    with tracer.start_span('greeting', child_of=root_span) as span:
-# #       app.logger.debug('GETTING GREETING')
-# #       res = http_get(greeterUrl, root_span)
-# #       span.log_kv({'event': 'get-greeting', 'value': res.text})
-# #       return 200, res.text      
-#        try: 
-#            app.logger.debug('GETTING GREETING')
-#            res = http_get(greeterUrl, root_span)
-#            app.logger.debug('GOT GREETING')
-#            span.log_kv({'event': 'get-greeting', 'value': res.text})
-#        except:
-#            res = None
-#        if res and res.status_code == 200:
-#            return 200, res.text
-#        else:
-#            status = res.status_code if res is not None and res.status_code else 500
-#            return status, 'Sorry, greetings not available.'
-#
-#def getName(root_span):
-#    with tracer.start_span('get-name', child_of=root_span) as span:
-#        try: 
-#            res = http_get(nameserviceUrl, root_span)
-#            span.log_kv({'event': 'get-name', 'value': res.text})
-#        except:
-#            res = None
-#        if res and res.status_code == 200:
-#            return 200, res.text
-#        else:
-#            status = res.status_code if res is not None and res.status_code else 500
-#            return status, 'Sorry, name service not available.'
-
 def http_get(url, headers):
     r = requests.get(url, headers=headers)
     assert r.status_code == 200
     return r 
-
-#def http_get(url, root_span):
-#    # span = tracer.active_span
-#    app.logger.debug('ENTERED HTTP GET')
-#    root_span.set_tag(tags.HTTP_METHOD, 'GET')
-#    root_span.set_tag(tags.HTTP_URL, url)
-#    root_span.set_tag(tags.SPAN_KIND, tags.SPAN_KIND_RPC_CLIENT)
-#    headers = {}
-#    tracer.inject(root_span, Format.HTTP_HEADERS, headers)
-#    
-#    app.logger.debug('GETTING: ' + url)
-#
-#    r = requests.get(url, headers=headers)
-#    # app.logger.debug('REQUEST STATUS CODE: ' + r.status_code)
-#    assert r.status_code == 200
-#    return r
 
 if __name__ == '__main__':
     monitor(app, port=8000)
