@@ -1,7 +1,7 @@
 openshift.withCluster() {
     env.APP_NAME = 'hello-world-service'
     env.NAMESPACE = openshift.project()
-    env.PROD_NAMESPACE = NAMESPACE.replaceAll(/cicd/, '')
+    env.PROD_NAMESPACE = NAMESPACE.replaceAll(/-cicd/, '')
     def configMap = openshift.selector('configmap', 'istio-app-subdomain').object()
     env.SUBDOMAIN = configMap.data["subdomain"]
     echo "APP_NAME: ${APP_NAME}"
