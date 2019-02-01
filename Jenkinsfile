@@ -146,12 +146,12 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject("$PROD_NAMESPACE") {
                             openshift.tag("$NAMESPACE/$APP_NAME:latest", "$PROD_NAMESPACE/$APP_NAME:production")
-                            openshift.set('image', "dc/${APP_NAME}-production", "${APP_NAME}=${PROD_NAMESPACE}/${APP_NAME}:production", "--source=imagestreamtag")
-                            openshift.selector('dc', "${APP_NAME}-production").rollout().latest()
-                            openshift.selector('dc', "${APP_NAME}-production").rollout().status()
-                            def latestVersion = openshift.selector('dc', "${APP_NAME}-production").object().status.latestVersion
+                            openshift.set('image', "dc/${APP_NAME}", "${APP_NAME}=${PROD_NAMESPACE}/${APP_NAME}:production", "--source=imagestreamtag")
+                            openshift.selector('dc', "${APP_NAME}").rollout().latest()
+                            openshift.selector('dc', "${APP_NAME}").rollout().status()
+                            def latestVersion = openshift.selector('dc', "${APP_NAME}").object().status.latestVersion
                             echo "Latest Version: ${latestVersion}"
-                            echo "Production pod(s) are up: " + openshift.selector('pod',['deployment':"${APP_NAME}-production-${latestVersion}"])
+                            echo "Production pod(s) are up: " + openshift.selector('pod',['deployment':"${APP_NAME}-${latestVersion}"])
                             // Remove Mirror
                             sh "sed 's/<istio-subdomain>/${SUBDOMAIN}/g' k8s/istio/hello-world-virtual-service-init.yaml.tmpl > k8s/istio/hello-world-virtual-service-init.yaml"
                             sh 'oc apply -n ${PROD_NAMESPACE} -f k8s/istio/hello-world-virtual-service-init.yaml'
