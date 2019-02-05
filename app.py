@@ -8,7 +8,7 @@ import time
 import opentracing
 import logging
 
-from flask import Flask, request, session
+from flask import Flask, request, session, abort
 from flask import _request_ctx_stack as stack
 from flask_prometheus import monitor
 from jaeger_client import Config, Tracer, ConstSampler
@@ -123,7 +123,8 @@ def index():
     status, name = getName() 
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     # time.sleep(int(2))
-    return "%s %s, %s!\n" % (timestamp, greeting, name)
+    do_cool_stuff()
+    return "%s %s, %s! -- Update\n" % (timestamp, greeting, name)
 
 @trace()
 def getGreeting():
@@ -157,6 +158,10 @@ def http_get(url, headers):
     r = requests.get(url, headers=headers)
     assert r.status_code == 200
     return r 
+
+def do_cool_stuff():
+    app.logger.debug('Doing Cool Stuff')
+    abort(500)
 
 if __name__ == '__main__':
     monitor(app, port=8000)
