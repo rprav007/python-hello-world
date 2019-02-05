@@ -119,12 +119,12 @@ def getForwardHeaders(request):
 
 @app.route('/')
 def index():
-    # do_cool_stuff()
+    do_cool_stuff()
     status, greeting = getGreeting()
     status, name = getName() 
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    return "%s %s, %s!\n" % (timestamp, greeting, name)
+    return "%s %s, %s!\n -- update" % (timestamp, greeting, name)
 
 @trace()
 def getGreeting():
