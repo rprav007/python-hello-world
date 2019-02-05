@@ -123,7 +123,7 @@ def index():
     status, name = getName() 
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
     # time.sleep(int(2))
-    # do_cool_stuff()
+    do_cool_stuff()
     return "%s %s, %s! -- Update\n" % (timestamp, greeting, name)
 
 @trace()
