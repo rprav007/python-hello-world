@@ -124,7 +124,7 @@ def index():
     status, name = getName() 
     timestamp = str(datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    return "%s %s, %s -- Hi Cigna!\n" % (timestamp, greeting, name)
+    return "%s %s, %s\n" % (timestamp, greeting, name)
 
 @trace()
 def getGreeting():
