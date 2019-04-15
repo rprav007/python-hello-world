@@ -57,7 +57,7 @@ parameters:
   - name: SOURCE_REPOSITORY_URL 
     displayName: Source Repository URL 
     description: The URL of the repository with your application source code 
-    value: https://github.com/cricci82/python-hello-world.git
+    value: https://github.com/rprav007/python-hello-world.git
     required: true 
   - name: BRANCH 
     displayName: Branch 
